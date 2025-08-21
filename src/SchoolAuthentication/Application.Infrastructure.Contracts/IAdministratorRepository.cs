@@ -5,7 +5,8 @@ using Domain.Entities;
 namespace Application.Infrastructure.Contracts;
 
 public interface IAdministratorRepository
-{
+{ 
+    Task<Administrator?> GetByLoginAsync(string login);
     Task<Administrator?> GetByIdAsync(Guid id);
     Task<IReadOnlyCollection<Administrator>> GetAllAsync();
     Task InsertAsync(Administrator administrator);

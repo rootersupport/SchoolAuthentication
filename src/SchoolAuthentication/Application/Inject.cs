@@ -12,6 +12,7 @@ public static class Inject
         services.AddScoped<ITeacherService, TeacherService>();
         services.AddScoped<IParentService, ParentService>();
         services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<IJwtService, JwtService>();
 
         return services;
     }

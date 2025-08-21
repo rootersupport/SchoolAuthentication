@@ -1,8 +1,12 @@
 using System.Reflection;
+using System.Text;
 using Application;
+using Application.Configuration;
 using Application.Mapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Postgres.Infrastructure;
 using Postgres.Infrastructure.Data;
 using Presentation.Shared.ExceptionsFilters;
@@ -15,10 +19,30 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // --- AutoMapper ---
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+//JWT
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 // --- Добавляем Application и Infrastructure слои ---
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices();
+
+// Авторизация и аутентификация
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+            ValidateIssuerSigningKey = true
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 // --- Swagger и версионирование ---
 builder.Services.AddEndpointsApiExplorer();
@@ -26,7 +50,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
-        Title = "SchoolCoreApi",
+        Title = "SchoolAuthentication",
         Version = "v1"
     });
 });
@@ -64,15 +88,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// --- Мидлвары ---
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "SchoolCoreApi v1");
-    });
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseRouting();

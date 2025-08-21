@@ -16,6 +16,12 @@ public class AdministratorRepository: IAdministratorRepository
         _context = context;
     }
     
+    public async Task<Administrator?> GetByLoginAsync(string login)
+    {
+        return await _context.Administrators.Where(u => u.Login == login)
+            .FirstOrDefaultAsync();
+    }
+    
     public async Task<Administrator?> GetByIdAsync(Guid id)
     {
         return await _context.Administrators.Where(a => a.Id == id).FirstOrDefaultAsync();
