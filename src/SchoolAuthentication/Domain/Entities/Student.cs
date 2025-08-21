@@ -26,4 +26,10 @@ public class Student
         TeacherName = teacherName;
         IsDeleted = false;
     }
+    
+    public void SetParent(Parent parent)
+    {
+        parent = parent ?? throw new ArgumentNullException(nameof(parent));
+        ParentId = parent.Id;
+    }
 }

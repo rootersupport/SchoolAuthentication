@@ -11,12 +11,15 @@ namespace Application.Services;
 public class ParentService: IParentService
 {
     private readonly IParentRepository _parentRepository;
+    private readonly IStudentRepository _studentRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<ParentService> _logger;
 
-    public ParentService(IParentRepository parentRepository, IMapper mapper, ILogger<ParentService> logger)
+    public ParentService(IParentRepository parentRepository, IStudentRepository studentRepository, IMapper mapper, 
+        ILogger<ParentService> logger)
     {
         _parentRepository = parentRepository;
+        _studentRepository = studentRepository;
         _mapper = mapper;
         _logger = logger;
     }
@@ -84,4 +87,21 @@ public class ParentService: IParentService
         await _parentRepository.DeleteAsync(parentId);
         return parentId;
     }
+    
+    public async Task<Guid> AddStudentToParentAsync(Guid parentId, Guid studentId)
+    {
+        var parent = await _parentRepository.GetByIdAsync(parentId);
+        if (parent == null || parent.IsDeleted)
+            throw new NotFoundException("Родитель не найден или был удален.");
+
+        var student = await _studentRepository.GetByIdAsync(studentId);
+        if (student == null)
+            throw new NotFoundException("Ученик не найден.");
+
+        parent.AddStudent(student);
+
+        await _parentRepository.UpdateAsync(parent);
+        return parent.Id;
+    }
+
 }

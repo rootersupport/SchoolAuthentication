@@ -10,5 +10,5 @@ public interface IParentService
     public Task<IReadOnlyCollection<Parent>> GetAllParentsAsync();
     public Task<Guid> ChangeParentAsync(ChangeParentDto changeParentDto);
     public Task<Guid> DeleteParentAsync(Guid parentId);
-
+    public Task<Guid> AddStudentToParentAsync(Guid parentId, Guid studentId);
 }

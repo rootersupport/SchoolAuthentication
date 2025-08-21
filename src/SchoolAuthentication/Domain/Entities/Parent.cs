@@ -10,7 +10,6 @@ public class Parent
     public string PhoneNumber { get; private set; }
     public DateTime DateCreated { get; private set; }
     public bool IsDeleted { get; private set; }
-    public ICollection<Student> Students { get; private set; } = new List<Student>();
     public void MarkAsDeleted() => IsDeleted = true;
     
     public Parent(string name, string? surname, string login, string password, string phoneNumber, DateTime dateCreated)
@@ -23,5 +22,14 @@ public class Parent
         PhoneNumber = phoneNumber;
         DateCreated = dateCreated;
         IsDeleted = false;
+    }
+    
+    public void AddStudent(Student student)
+    {
+        if (student == null) 
+            throw new ArgumentNullException(nameof(student));
+
+        // привязываем родителя к ученику
+        student.SetParent(this);
     }
 }

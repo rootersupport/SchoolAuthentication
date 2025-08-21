@@ -45,4 +45,10 @@ public class ParentController: ControllerBase
     {
         return Ok(await _parentService.DeleteParentAsync(parentId));
     }
+
+    [HttpPost("AssignStudentToParent")]
+    public async Task<IActionResult> AddStudentToParentAsync([FromQuery] Guid parentId, [FromQuery] Guid studentId)
+    {
+        return Ok(await _parentService.AddStudentToParentAsync(parentId, studentId));
+    }
 }
